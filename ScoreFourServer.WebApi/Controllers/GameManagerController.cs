@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ScoreFourServer.Domain.Adapter;
-using ScoreFourServer.Domain.Entities;
 using ScoreFourServer.Domain.Exceptions;
 using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.ValueObject;
-using ScoreFourServer.ViewModel;
+using ScoreFourServer.WebApi.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ScoreFourServer.Controllers
+namespace ScoreFourServer.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -34,7 +33,7 @@ namespace ScoreFourServer.Controllers
         }
 
         [HttpPatch("Movement")]
-        public async Task<ActionResult> SetMovementAsync([FromBody]MovementPatchVM movementPatch)
+        public async Task<IActionResult> SetMovementAsync([FromBody]MovementPatchVM movementPatch)
         {
             var ct = HttpContext.RequestAborted;
             var gameRoom = await gameRoomAdapter.GetAsync(movementPatch.GameRoomId, ct);
@@ -45,9 +44,10 @@ namespace ScoreFourServer.Controllers
             var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
             try
             {
+                var playerId = gameRoom.Players[movementPatch.PlayerNumber - 1].GameUserId;
                 var movement = new Movement(
                     movementPatch.X, movementPatch.Y, movementPatch.Counter,
-                    movementPatch.PlayerId, movementPatch.GameRoomId, DateTimeOffset.Now
+                    playerId, movementPatch.GameRoomId, DateTimeOffset.Now
                     );
                 await gameManager.MoveAsync(movement, ct);
             }
@@ -59,7 +59,7 @@ namespace ScoreFourServer.Controllers
         }
 
         [HttpGet("Movement")]
-        public async Task<ActionResult> GetMovementAsync(Guid gameRoomId, [Range(1, 2)]int playerNumber, int counter)
+        public async Task<IActionResult> GetMovementAsync(Guid gameRoomId, int counter)
         {
 
             var ct = HttpContext.RequestAborted;
@@ -69,11 +69,10 @@ namespace ScoreFourServer.Controllers
                 return BadRequest("Invalid game room number.");
             }
             var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
-            var player = gameRoom.Players[playerNumber - 1];
             Movement movement;
             try
             {
-                movement = await gameManager.GetMovementAsync(player, counter, ct);
+                movement = await gameManager.GetMovementAsync(counter, ct);
             }
             catch (GameException ex)
             {
@@ -87,7 +86,7 @@ namespace ScoreFourServer.Controllers
         }
 
         [HttpGet("IsEnded")]
-        public async Task<ActionResult> IsEndedAsync(Guid gameRoomId)
+        public async Task<IActionResult> IsEndedAsync(Guid gameRoomId)
         {
             var ct = HttpContext.RequestAborted;
             var gameRoom = await gameRoomAdapter.GetAsync(gameRoomId, ct);

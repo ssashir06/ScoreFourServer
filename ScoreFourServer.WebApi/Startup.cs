@@ -16,7 +16,7 @@ using ScoreFourServer.Domain.Services;
 using ScoreFourServer.OnMemory.Adapter;
 using Microsoft.OpenApi.Models;
 
-namespace ScoreFourServer
+namespace ScoreFourServer.WebApi
 {
     public class Startup
     {
@@ -55,10 +55,10 @@ namespace ScoreFourServer
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseDeveloperExceptionPage();
-            //}
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -66,11 +66,11 @@ namespace ScoreFourServer
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScoreFourServer.Controllers
+namespace ScoreFourServer.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -26,8 +26,8 @@ namespace ScoreFourServer.Controllers
             this.playerMatchingService = playerMatchingService;
         }
 
-        [HttpGet("Match")]
-        public async Task<ActionResult> MatchAsync(Guid gameUserId, string name)
+        [HttpGet("")]
+        public async Task<IActionResult> MatchAsync(Guid gameUserId, string name)
         {
             var player = new Player
             {
@@ -38,6 +38,7 @@ namespace ScoreFourServer.Controllers
             var gameRoom = await playerMatchingService.MatchAsync(player, ct);
             if (gameRoom != null)
             {
+                logger.LogInformation($"Matching found: Player1={gameRoom.Players[0].Name}, Player2={gameRoom.Players[1].Name}");
                 return new JsonResult(gameRoom);
             }
             else

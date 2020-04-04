@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace ScoreFourServer
+namespace ScoreFourServer.WebApi
 {
     public class Program
     {
