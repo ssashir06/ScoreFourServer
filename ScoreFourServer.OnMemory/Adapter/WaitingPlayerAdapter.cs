@@ -1,6 +1,7 @@
 ﻿using ScoreFourServer.Domain.Adapter;
 using ScoreFourServer.Domain.Entities;
 using ScoreFourServer.Domain.ValueObject;
+using ScoreFourServer.OnMemory.Tools;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,7 +18,7 @@ namespace ScoreFourServer.OnMemory.Adapter
 
         public async Task<Player> DequeueAsync(CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            await Dummy.Delay(cancellationToken);
             lock (WaitingPlayers)
             {
                 if (WaitingPlayers.Count > 0)
@@ -35,7 +36,7 @@ namespace ScoreFourServer.OnMemory.Adapter
 
         public async Task EnqueueAsync(Player player, CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            await Dummy.Delay(cancellationToken);
             lock (WaitingPlayers)
             {
                 if (WaitingPlayers.Any(m => m.GameUserId == player.GameUserId))

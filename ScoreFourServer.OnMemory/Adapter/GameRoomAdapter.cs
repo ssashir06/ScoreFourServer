@@ -1,6 +1,7 @@
 ﻿using ScoreFourServer.Domain.Adapter;
 using ScoreFourServer.Domain.Entities;
 using ScoreFourServer.Domain.ValueObject;
+using ScoreFourServer.OnMemory.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,19 +17,19 @@ namespace ScoreFourServer.OnMemory.Adapter
 
         public async Task AddAsync(GameRoom gameRoom, CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            await Dummy.Delay(cancellationToken);
             GameRooms.Add(gameRoom);
         }
 
         public async Task<GameRoom> GetAsync(Guid gameRoomId, CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            await Dummy.Delay(cancellationToken);
             return GameRooms.FirstOrDefault(m => m.GameRoomId == gameRoomId);
         }
 
         public async Task<GameRoom> GetLatestByPlayerAsync(Player player, CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+            await Dummy.Delay(cancellationToken);
             return GameRooms.OrderByDescending(m => m.CreateDate).FirstOrDefault(m => m.Players.Select(p => p.GameUserId).Contains(player.GameUserId));
         }
 
