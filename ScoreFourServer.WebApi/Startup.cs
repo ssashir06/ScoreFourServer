@@ -20,7 +20,7 @@ namespace ScoreFourServer.WebApi
 {
     public class Startup
     {
-        readonly string allowSpecificOrigins = "_allowSpecificOrigins";
+        readonly string allowSpecificOriginsForDev = "_allowSpecificOriginsDev";
 
 
         public Startup(IConfiguration configuration)
@@ -39,10 +39,11 @@ namespace ScoreFourServer.WebApi
             // Cors
             services.AddCors(options =>
             {
-                options.AddPolicy(allowSpecificOrigins,
+                options.AddPolicy(allowSpecificOriginsForDev,
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:51087",
+                        builder.WithOrigins(
+                            "http://localhost:49205",
                             "https://scorefour.z7.web.core.windows.net")
                         .AllowAnyHeader()
                         .AllowAnyMethod();
@@ -80,7 +81,7 @@ namespace ScoreFourServer.WebApi
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ScoreFourServer API V1");
             });
 
             app.UseHttpsRedirection();
@@ -89,7 +90,10 @@ namespace ScoreFourServer.WebApi
 
             app.UseAuthorization();
 
-            app.UseCors(allowSpecificOrigins);
+            if (env.IsDevelopment())
+            {
+                app.UseCors(allowSpecificOriginsForDev);
+            }
 
             app.UseEndpoints(endpoints =>
             {

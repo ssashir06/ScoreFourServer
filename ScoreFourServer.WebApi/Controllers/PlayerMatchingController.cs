@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ScoreFourServer.Domain.Services;
 using ScoreFourServer.Domain.ValueObject;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 namespace ScoreFourServer.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class PlayerMatchingController : ControllerBase
     {
         private readonly ILogger<PlayerMatchingController> logger;
@@ -28,6 +29,7 @@ namespace ScoreFourServer.WebApi.Controllers
         }
 
         [HttpPut("GamePlayer")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> AddGamePlayer(GamePlayerPutVM gamePlayer)
         {
             var player = new Player
@@ -41,7 +43,9 @@ namespace ScoreFourServer.WebApi.Controllers
             return Ok();
         }
 
-        [HttpGet("GameRoom")]
+        [HttpGet("GamePlayer/{gameUserId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
         public async Task<IActionResult> MatchAsync(Guid gameUserId)
         {
             var player = new Player

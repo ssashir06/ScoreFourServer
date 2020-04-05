@@ -8,7 +8,6 @@ namespace ScoreFourServer.WebApi.ViewModel
 {
     public class MovementPutVM
     {
-        public Guid GameRoomId { get; set; }
         [Range(1, 2)]
         public int PlayerNumber { get; set; }
         public int X { get; set; }

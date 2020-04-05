@@ -74,8 +74,8 @@ namespace ScoreFourServer.WebApi.Test
             // Act
             var results = new []
             {
-                await controller.MatchAsync(playerGuids[0], "Player 1"),
-                await controller.MatchAsync(playerGuids[1], "Player 2"),
+                await controller.MatchAsync(playerGuids[0]),
+                await controller.MatchAsync(playerGuids[1]),
             };
 
             // Assert
