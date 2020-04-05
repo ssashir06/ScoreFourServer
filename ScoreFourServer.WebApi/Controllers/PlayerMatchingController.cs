@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using ScoreFourServer.Domain.Services;
 using ScoreFourServer.Domain.ValueObject;
+using ScoreFourServer.WebApi.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,19 +27,32 @@ namespace ScoreFourServer.WebApi.Controllers
             this.playerMatchingService = playerMatchingService;
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> MatchAsync(Guid gameUserId, string name)
+        [HttpPut("GamePlayer")]
+        public async Task<IActionResult> AddGamePlayer(GamePlayerPutVM gamePlayer)
+        {
+            var player = new Player
+            {
+                GameUserId = gamePlayer.GameUserId,
+                Name = gamePlayer.Name,
+            };
+            var ct = HttpContext.RequestAborted;
+            await playerMatchingService.AddGamePlayer(player, ct);
+
+            return Ok();
+        }
+
+        [HttpGet("GameRoom")]
+        public async Task<IActionResult> MatchAsync(Guid gameUserId)
         {
             var player = new Player
             {
                 GameUserId = gameUserId,
-                Name = name,
             };
             var ct = HttpContext.RequestAborted;
             var gameRoom = await playerMatchingService.MatchAsync(player, ct);
             if (gameRoom != null)
             {
-                logger.LogInformation($"Matching found: Player1={gameRoom.Players[0].Name}, Player2={gameRoom.Players[1].Name}");
+                logger.LogInformation($"Matching found: Player1={gameRoom.Players[0].Name} {gameRoom.Players[0].GameUserId}, Player2={gameRoom.Players[1].Name} {gameRoom.Players[1].GameUserId}");
                 return new JsonResult(gameRoom);
             }
             else

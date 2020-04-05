@@ -27,6 +27,26 @@ namespace ScoreFourServer.Domain.Services
             this.gameManagerFactory = gameManagerFactory;
         }
 
+        public async Task AddGamePlayer(Player player, CancellationToken cancellationToken)
+        {
+            var waitingPlayer = await this.waitingPlayerAdapter.DequeueAsync(cancellationToken);
+            if (waitingPlayer == null)
+            {
+                await waitingPlayerAdapter.EnqueueAsync(player, cancellationToken);
+            }
+            else
+            {
+                var newGameRoom = new GameRoom
+                {
+                    CreateDate = DateTimeOffset.Now,
+                    GameRoomId = Guid.NewGuid(),
+                    Name = $"Game room {DateTimeOffset.UtcNow:F}",
+                    Players = new[] { waitingPlayer, player },
+                };
+                await gameRoomAdapter.AddAsync(newGameRoom, cancellationToken);
+            }
+        }
+
         public async Task<GameRoom> MatchAsync(Player player, CancellationToken cancellationToken)
         {
             var createdGameRoom = await gameRoomAdapter.GetLatestByPlayerAsync(player, cancellationToken);
@@ -38,30 +58,6 @@ namespace ScoreFourServer.Domain.Services
                     return createdGameRoom;
                 }
             }
-
-            Player waitingPlayer;
-            while (true)
-            {
-                waitingPlayer = await this.waitingPlayerAdapter.DequeueAsync(cancellationToken);
-                if (waitingPlayer == null || waitingPlayer.GameUserId != player.GameUserId)
-                {
-                    break;
-                }
-            }
-            if (waitingPlayer != null)
-            {
-                var newGameRoom = new GameRoom
-                {
-                    CreateDate = DateTimeOffset.Now,
-                    GameRoomId = Guid.NewGuid(),
-                    Name = $"Game room {DateTimeOffset.UtcNow:F}",
-                    Players = new[] { waitingPlayer, player },
-                };
-                await gameRoomAdapter.AddAsync(newGameRoom, cancellationToken);
-                return newGameRoom;
-            }
-
-            await waitingPlayerAdapter.EnqueueAsync(player, cancellationToken);
 
             return null;
         }

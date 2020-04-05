@@ -32,8 +32,8 @@ namespace ScoreFourServer.WebApi.Controllers
             this.gameManagerFactory = gameManagerFactory;
         }
 
-        [HttpPatch("Movement")]
-        public async Task<IActionResult> SetMovementAsync([FromBody]MovementPatchVM movementPatch)
+        [HttpPut("Movement")]
+        public async Task<IActionResult> SetMovementAsync([FromBody]MovementPutVM movementPatch)
         {
             var ct = HttpContext.RequestAborted;
             var gameRoom = await gameRoomAdapter.GetAsync(movementPatch.GameRoomId, ct);

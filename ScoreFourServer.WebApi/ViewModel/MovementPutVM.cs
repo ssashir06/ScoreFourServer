@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ScoreFourServer.WebApi.ViewModel
 {
-    public class MovementPatchVM
+    public class MovementPutVM
     {
         public Guid GameRoomId { get; set; }
         [Range(1, 2)]
