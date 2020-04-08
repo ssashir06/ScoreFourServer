@@ -43,7 +43,8 @@ namespace ScoreFourServer.OnMemory.Adapter
                 if (WaitingPlayers.Any(m => m.Item1.GameUserId == player.GameUserId))
                 {
                     Trace.WriteLine($"Game user id {player.GameUserId} is already enqueued.");
-                } else
+                }
+                else
                 {
                     WaitingPlayers.Add(Tuple.Create(player, timeOut));
                 }

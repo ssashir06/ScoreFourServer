@@ -30,7 +30,7 @@ namespace ScoreFourServer.Domain.Services
         public async Task AddGamePlayer(Player player, CancellationToken cancellationToken)
         {
             var waitingPlayer = await this.waitingPlayerAdapter.DequeueAsync(cancellationToken);
-            if (waitingPlayer == null)
+            if (waitingPlayer == null || waitingPlayer.GameUserId == player.GameUserId)
             {
                 await waitingPlayerAdapter.EnqueueAsync(player, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(5), cancellationToken);
             }
