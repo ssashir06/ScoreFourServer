@@ -30,7 +30,7 @@ namespace ScoreFourServer.Domain.Services
         public async Task AddGamePlayer(Player player, CancellationToken cancellationToken)
         {
             var waitingPlayer = await this.waitingPlayerAdapter.DequeueAsync(cancellationToken);
-            if (waitingPlayer == null)
+            if (waitingPlayer == null || waitingPlayer.GameUserId == player.GameUserId)
             {
                 await waitingPlayerAdapter.EnqueueAsync(player, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(5), cancellationToken);
             }
@@ -42,6 +42,7 @@ namespace ScoreFourServer.Domain.Services
                     GameRoomId = Guid.NewGuid(),
                     Name = $"Game room {DateTimeOffset.UtcNow:F}",
                     Players = new[] { waitingPlayer, player },
+                    GameRoomStatus = GameRoomStatus.Created,
                 };
                 await gameRoomAdapter.AddAsync(newGameRoom, cancellationToken);
             }
@@ -53,7 +54,8 @@ namespace ScoreFourServer.Domain.Services
             if (createdGameRoom != null)
             {
                 var gameManager = await gameManagerFactory.FactoryAsync(createdGameRoom, cancellationToken);
-                if (!await gameManager.IsEndedAsync(cancellationToken))
+                await gameManager.UpdateGameRoomStatusAsync(cancellationToken);
+                if (gameManager.GameRoom.GameRoomStatus == GameRoomStatus.Created)
                 {
                     return createdGameRoom;
                 }

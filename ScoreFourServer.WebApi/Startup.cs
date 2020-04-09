@@ -42,11 +42,10 @@ namespace ScoreFourServer.WebApi
                 options.AddPolicy(allowSpecificOriginsForDev,
                     builder =>
                     {
-                        builder.WithOrigins(
-                            "http://localhost:49205",
-                            "https://scorefour.z7.web.core.windows.net")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
                     });
             });
 
@@ -58,6 +57,7 @@ namespace ScoreFourServer.WebApi
 
             // DI
             services.AddScoped(sp => new GameManagerFactory(
+                sp.GetService<IGameRoomAdapter>(),
                 sp.GetService<IGameMovementAdapter>()
                 ));
             services.AddScoped(sp => new PlayerMatchingService(

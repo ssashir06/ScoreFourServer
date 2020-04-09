@@ -18,20 +18,40 @@ namespace ScoreFourServer.OnMemory.Adapter
         public async Task AddAsync(GameRoom gameRoom, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
-            GameRooms.Add(gameRoom);
+            lock (GameRooms)
+            {
+                GameRooms.Add(gameRoom);
+            }
         }
 
         public async Task<GameRoom> GetAsync(Guid gameRoomId, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
-            return GameRooms.FirstOrDefault(m => m.GameRoomId == gameRoomId);
+            lock (GameRooms)
+            {
+                return GameRooms.FirstOrDefault(m => m.GameRoomId == gameRoomId);
+            }
         }
 
         public async Task<GameRoom> GetLatestByPlayerAsync(Player player, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
-            return GameRooms.OrderByDescending(m => m.CreateDate).FirstOrDefault(m => m.Players.Select(p => p.GameUserId).Contains(player.GameUserId));
+            lock (GameRooms)
+            {
+                return GameRooms
+                    .OrderByDescending(m => m.CreateDate)
+                    .FirstOrDefault(m => m.Players.Select(p => p.GameUserId).Contains(player.GameUserId));
+            }
         }
 
+        public async Task SaveAsync(GameRoom gameRoom, CancellationToken cancellationToken)
+        {
+            await Dummy.Delay(cancellationToken);
+            lock (GameRooms)
+            {
+                GameRooms.RemoveAll(m => m.GameRoomId == gameRoom.GameRoomId);
+                GameRooms.Add(gameRoom);
+            }
+        }
     }
 }

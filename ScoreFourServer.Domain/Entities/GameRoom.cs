@@ -11,5 +11,7 @@ namespace ScoreFourServer.Domain.Entities
         public string Name { get; set; }
         public IList<Player> Players { get; set; }
         public DateTimeOffset CreateDate { get; set; }
+        public GameRoomStatus GameRoomStatus { get; set; }
+        public int? Winner { get; set; }
     }
 }

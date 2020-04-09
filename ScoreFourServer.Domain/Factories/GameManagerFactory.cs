@@ -12,12 +12,15 @@ namespace ScoreFourServer.Domain.Factories
 {
     public class GameManagerFactory
     {
+        private readonly IGameRoomAdapter gameRoomAdapter;
         private readonly IGameMovementAdapter gameMovementAdapter;
 
         public GameManagerFactory(
+            IGameRoomAdapter gameRoomAdapter,
             IGameMovementAdapter gameMovementAdapter
             )
         {
+            this.gameRoomAdapter = gameRoomAdapter;
             this.gameMovementAdapter = gameMovementAdapter;
         }
         
@@ -26,6 +29,7 @@ namespace ScoreFourServer.Domain.Factories
             var movements = await gameMovementAdapter.GetListAsync(gameRoom, cancellationToken);
 
             return new GameManagerModel(
+                gameRoomAdapter,
                 gameMovementAdapter,
                 gameRoom
                 )

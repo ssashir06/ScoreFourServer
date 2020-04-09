@@ -28,6 +28,7 @@ namespace ScoreFourServer.WebApi.Test
         {
             var services = new ServiceCollection();
             services.AddScoped(sp => new GameManagerFactory(
+                sp.GetService<IGameRoomAdapter>(),
                 sp.GetService<IGameMovementAdapter>()
                 ));
             services.AddScoped(sp => new PlayerMatchingService(
