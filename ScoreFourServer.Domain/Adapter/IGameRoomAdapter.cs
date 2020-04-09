@@ -13,5 +13,6 @@ namespace ScoreFourServer.Domain.Adapter
         Task AddAsync(GameRoom gameRoom, CancellationToken cancellationToken);
         Task<GameRoom> GetAsync(Guid gameRoomId, CancellationToken cancellationToken);
         Task<GameRoom> GetLatestByPlayerAsync(Player player, CancellationToken cancellationToken);
+        Task SaveAsync(GameRoom gameRoom, CancellationToken cancellationToken);
     }
 }

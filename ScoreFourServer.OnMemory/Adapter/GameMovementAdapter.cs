@@ -17,20 +17,29 @@ namespace ScoreFourServer.OnMemory.Adapter
         public async Task<Movement> GetAsync(GameRoom gameRoom, int counter, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
-            return Movements.FirstOrDefault(m => 
-                m.GameRoomId == gameRoom.GameRoomId && m.Counter == counter);
+            lock (Movements)
+            {
+                return Movements.FirstOrDefault(m =>
+                    m.GameRoomId == gameRoom.GameRoomId && m.Counter == counter);
+            }
         }
 
         public async Task AddAsync(GameRoom gameRoom, Movement movement, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
-            Movements.Add(movement);
+            lock (Movements)
+            {
+                Movements.Add(movement);
+            }
         }
 
         public async Task<IList<Movement>> GetListAsync(GameRoom gameRoom, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
-            return Movements.Where(m => m.GameRoomId == gameRoom.GameRoomId).ToList();
+            lock (Movements)
+            {
+                return Movements.Where(m => m.GameRoomId == gameRoom.GameRoomId).ToList();
+            }
         }
     }
 }

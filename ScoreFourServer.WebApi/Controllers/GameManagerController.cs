@@ -90,10 +90,10 @@ namespace ScoreFourServer.WebApi.Controllers
             return new JsonResult(movement);
         }
 
-        [HttpGet("{gameRoomId}/IsEnded")]
+        [HttpGet("{gameRoomId}/Status")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> IsEndedAsync(Guid gameRoomId)
+        public async Task<IActionResult> UpdateAndGetGameStatus(Guid gameRoomId)
         {
             var ct = HttpContext.RequestAborted;
             var gameRoom = await gameRoomAdapter.GetAsync(gameRoomId, ct);
@@ -102,13 +102,15 @@ namespace ScoreFourServer.WebApi.Controllers
                 return BadRequest("Invalid game room number.");
             }
             var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
-            return new JsonResult(await gameManager.IsEndedAsync(ct));
+            await gameManager.UpdateGameRoomStatusAsync(ct);
+            var status = gameManager.GameRoom.GameRoomStatus;
+            return new JsonResult(status);
         }
 
-        [HttpGet("{gameRoomId}/Status")]
+        [HttpPut("{gameRoomId}/Winner")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetGameStatus(Guid gameRoomId)
+        public async Task<IActionResult> ReportWinnerAsync(Guid gameRoomId, [Range(1, 2)]int playerNumber)
         {
             var ct = HttpContext.RequestAborted;
             var gameRoom = await gameRoomAdapter.GetAsync(gameRoomId, ct);
@@ -116,8 +118,25 @@ namespace ScoreFourServer.WebApi.Controllers
             {
                 return BadRequest("Invalid game room number.");
             }
-            return new JsonResult(gameRoom);
+            var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
+            await gameManager.UpdateWinnerAsync(playerNumber, ct);
+            return Ok();
+        }
 
+        [HttpPut("{gameRoomId}/Leave")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> LeaveGameAsync(Guid gameRoomId, [Range(1, 2)]int playerNumber)
+        {
+            var ct = HttpContext.RequestAborted;
+            var gameRoom = await gameRoomAdapter.GetAsync(gameRoomId, ct);
+            if (gameRoom == null)
+            {
+                return BadRequest("Invalid game room number.");
+            }
+            var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
+            await gameManager.LeaveGameAsync(playerNumber, ct);
+            return Ok();
         }
     }
 }

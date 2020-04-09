@@ -13,12 +13,15 @@ namespace ScoreFourServer.Domain.Models
 {
     public class GameManagerModel
     {
+        private readonly IGameRoomAdapter gameRoomAdapter;
         private readonly IGameMovementAdapter gameMovementAdapter;
 
         public GameManagerModel(
+            IGameRoomAdapter gameRoomAdapter,
             IGameMovementAdapter gameMovementAdapter,
             GameRoom gameRoom)
         {
+            this.gameRoomAdapter = gameRoomAdapter;
             this.gameMovementAdapter = gameMovementAdapter;
             this.GameRoom = gameRoom;
             this.PlayerNumber = 1;
@@ -49,6 +52,17 @@ namespace ScoreFourServer.Domain.Models
             }
 
             await gameMovementAdapter.AddAsync(GameRoom, movement, cancellationToken);
+
+            if (GameRoom.GameRoomStatus == GameRoomStatus.Created)
+            {
+                GameRoom.GameRoomStatus = GameRoomStatus.Started;
+                await gameRoomAdapter.SaveAsync(GameRoom, cancellationToken);
+            }
+            else
+            {
+                await CheckTimeout(cancellationToken);
+            }
+
             this.Counter++;
             this.PlayerNumber = this.PlayerNumber == 1 ? 2 : 1;
         }
@@ -58,28 +72,67 @@ namespace ScoreFourServer.Domain.Models
             return await gameMovementAdapter.GetAsync(this.GameRoom, counter, cancellationToken);
         }
 
-        public async Task<bool> IsEndedAsync(CancellationToken cancellationToken)
+        public async Task UpdateGameRoomStatusAsync(CancellationToken cancellationToken)
         {
-            // FIXME: Use game room status instead.
-            return false;
+            await CheckTimeout(cancellationToken);
+        }
+
+        private async Task CheckTimeout(CancellationToken cancellationToken)
+        {
+            if (GameRoom.GameRoomStatus == GameRoomStatus.TimedOut)
+            {
+                return;
+            }
 
             var now = DateTimeOffset.UtcNow;
             if (now - this.GameRoom.CreateDate > TimeSpan.FromMinutes(10))
             {
-                return true;
+                GameRoom.GameRoomStatus = GameRoomStatus.TimedOut;
             }
+
             var movements = await gameMovementAdapter.GetListAsync(GameRoom, cancellationToken);
             if (!movements.Any()
-                && now - this.GameRoom.CreateDate > TimeSpan.FromMinutes(1))
+                && now - this.GameRoom.CreateDate > TimeSpan.FromMinutes(5))
             {
-                return true;
+                GameRoom.GameRoomStatus = GameRoomStatus.TimedOut;
             }
             if (movements.Any()
-                && now - movements.Max(m => m.CreateDate) > TimeSpan.FromMinutes(1))
+                && now - movements.Max(m => m.CreateDate) > TimeSpan.FromMinutes(5))
             {
-                return true;
+                GameRoom.GameRoomStatus = GameRoomStatus.TimedOut;
             }
-            return false;
+
+            if (GameRoom.GameRoomStatus == GameRoomStatus.TimedOut)
+            {
+                await gameRoomAdapter.SaveAsync(GameRoom, cancellationToken);
+            }
+        }
+
+        public async Task UpdateWinnerAsync(int playerNumber, CancellationToken ct)
+        {
+            if (GameRoom.GameRoomStatus == GameRoomStatus.GameOver && GameRoom.Winner == playerNumber)
+            {
+                return;
+            }
+            if (GameRoom.GameRoomStatus != GameRoomStatus.Started)
+            {
+                throw new ArgumentException(nameof(playerNumber));
+            }
+
+            GameRoom.GameRoomStatus = GameRoomStatus.GameOver;
+            GameRoom.Winner = PlayerNumber;
+            await gameRoomAdapter.SaveAsync(GameRoom, ct);
+        }
+
+        public async Task LeaveGameAsync(int playerNumber, CancellationToken ct)
+        {
+            if (new[] { GameRoomStatus.GameOver, GameRoomStatus.TimedOut }.Contains(GameRoom.GameRoomStatus))
+            {
+                return;
+            }
+
+            GameRoom.GameRoomStatus = GameRoomStatus.Left;
+            await gameRoomAdapter.SaveAsync(GameRoom, ct);
         }
     }
 }

@@ -42,6 +42,7 @@ namespace ScoreFourServer.Domain.Services
                     GameRoomId = Guid.NewGuid(),
                     Name = $"Game room {DateTimeOffset.UtcNow:F}",
                     Players = new[] { waitingPlayer, player },
+                    GameRoomStatus = GameRoomStatus.Created,
                 };
                 await gameRoomAdapter.AddAsync(newGameRoom, cancellationToken);
             }
@@ -53,7 +54,8 @@ namespace ScoreFourServer.Domain.Services
             if (createdGameRoom != null)
             {
                 var gameManager = await gameManagerFactory.FactoryAsync(createdGameRoom, cancellationToken);
-                if (!await gameManager.IsEndedAsync(cancellationToken))
+                await gameManager.UpdateGameRoomStatusAsync(cancellationToken);
+                if (gameManager.GameRoom.GameRoomStatus == GameRoomStatus.Created)
                 {
                     return createdGameRoom;
                 }
