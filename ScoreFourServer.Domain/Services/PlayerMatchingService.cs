@@ -32,7 +32,7 @@ namespace ScoreFourServer.Domain.Services
             var waitingPlayer = await this.waitingPlayerAdapter.DequeueAsync(cancellationToken);
             if (waitingPlayer == null || waitingPlayer.GameUserId == player.GameUserId)
             {
-                await waitingPlayerAdapter.EnqueueAsync(player, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(5), cancellationToken);
+                await waitingPlayerAdapter.EnqueueAsync(player, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(10), cancellationToken);
             }
             else
             {

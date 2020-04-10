@@ -40,6 +40,7 @@ namespace ScoreFourServer.OnMemory.Adapter
             await Dummy.Delay(cancellationToken);
             lock (WaitingPlayers)
             {
+                WaitingPlayers.RemoveAll(m => DateTimeOffset.Now >= m.Item2);
                 if (WaitingPlayers.Any(m => m.Item1.GameUserId == player.GameUserId))
                 {
                     Trace.WriteLine($"Game user id {player.GameUserId} is already enqueued.");

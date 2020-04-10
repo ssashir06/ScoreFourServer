@@ -85,11 +85,6 @@ namespace ScoreFourServer.Domain.Models
             }
 
             var now = DateTimeOffset.UtcNow;
-            if (now - this.GameRoom.CreateDate > TimeSpan.FromMinutes(10))
-            {
-                GameRoom.GameRoomStatus = GameRoomStatus.TimedOut;
-            }
-
             var movements = await gameMovementAdapter.GetListAsync(GameRoom, cancellationToken);
             if (!movements.Any()
                 && now - this.GameRoom.CreateDate > TimeSpan.FromMinutes(5))
