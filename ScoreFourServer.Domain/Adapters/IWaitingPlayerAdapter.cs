@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScoreFourServer.Domain.Adapter
+namespace ScoreFourServer.Domain.Adapters
 {
     public interface IWaitingPlayerAdapter
     {

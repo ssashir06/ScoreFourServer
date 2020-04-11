@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScoreFourServer.WebApi", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScoreFourServer.Domain", "ScoreFourServer.Domain\ScoreFourServer.Domain.csproj", "{43220B70-642E-4397-A0A4-3A6A2C4A18E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScoreFourServer.OnMemory", "ScoreFourServer.OnMemory\ScoreFourServer.OnMemory.csproj", "{65A94E39-6D75-49CE-88B1-5E317B07F93E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScoreFourServer.Adapters.OnMemory", "ScoreFourServer.Adapters.OnMemory\ScoreFourServer.Adapters.OnMemory.csproj", "{65A94E39-6D75-49CE-88B1-5E317B07F93E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScoreFourServer.WebApi.Test", "ScoreFourServer.WebApi.Test\ScoreFourServer.WebApi.Test.csproj", "{6DD017B8-292C-4549-8F08-D5D36D4340E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScoreFourServer.WebApi.Test", "ScoreFourServer.WebApi.Test\ScoreFourServer.WebApi.Test.csproj", "{6DD017B8-292C-4549-8F08-D5D36D4340E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

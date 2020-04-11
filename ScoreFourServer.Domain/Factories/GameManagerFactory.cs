@@ -1,4 +1,4 @@
-﻿using ScoreFourServer.Domain.Adapter;
+﻿using ScoreFourServer.Domain.Adapters;
 using ScoreFourServer.Domain.Entities;
 using ScoreFourServer.Domain.Models;
 using System;

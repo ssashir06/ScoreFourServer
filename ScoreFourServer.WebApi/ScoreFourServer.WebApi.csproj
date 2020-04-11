@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ScoreFourServer.Adapters.OnMemory\ScoreFourServer.Adapters.OnMemory.csproj" />
     <ProjectReference Include="..\ScoreFourServer.Domain\ScoreFourServer.Domain.csproj" />
-    <ProjectReference Include="..\ScoreFourServer.OnMemory\ScoreFourServer.OnMemory.csproj" />
   </ItemGroup>
 
 

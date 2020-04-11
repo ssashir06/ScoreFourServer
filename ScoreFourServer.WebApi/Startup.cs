@@ -10,10 +10,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ScoreFourServer.Domain.Adapter;
+using ScoreFourServer.Domain.Adapters;
 using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.Services;
-using ScoreFourServer.OnMemory.Adapter;
+using ScoreFourServer.Adapters.OnMemory;
 using Microsoft.OpenApi.Models;
 
 namespace ScoreFourServer.WebApi
