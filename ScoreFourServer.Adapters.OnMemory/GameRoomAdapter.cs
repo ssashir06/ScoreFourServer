@@ -15,15 +15,6 @@ namespace ScoreFourServer.Adapters.OnMemory
     {
         internal static List<GameRoom> GameRooms { get; } = new List<GameRoom>();
 
-        public async Task AddAsync(GameRoom gameRoom, CancellationToken cancellationToken)
-        {
-            await Dummy.Delay(cancellationToken);
-            lock (GameRooms)
-            {
-                GameRooms.Add(gameRoom);
-            }
-        }
-
         public async Task<GameRoom> GetAsync(Guid gameRoomId, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
@@ -33,7 +24,7 @@ namespace ScoreFourServer.Adapters.OnMemory
             }
         }
 
-        public async Task<GameRoom> GetLatestByPlayerAsync(Player player, CancellationToken cancellationToken)
+        public async Task<GameRoom> GetLatestCreatedByPlayerAsync(Player player, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
             lock (GameRooms)

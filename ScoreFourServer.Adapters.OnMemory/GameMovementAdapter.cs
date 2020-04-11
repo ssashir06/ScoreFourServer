@@ -24,11 +24,12 @@ namespace ScoreFourServer.Adapters.OnMemory
             }
         }
 
-        public async Task AddAsync(GameRoom gameRoom, Movement movement, CancellationToken cancellationToken)
+        public async Task SaveAsync(GameRoom gameRoom, Movement movement, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
             lock (Movements)
             {
+                Movements.RemoveAll(m => m.GameRoomId == movement.GameRoomId && m.Counter == movement.Counter);
                 Movements.Add(movement);
             }
         }

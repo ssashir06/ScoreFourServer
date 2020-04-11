@@ -6,7 +6,13 @@ namespace ScoreFourServer.Domain.ValueObject
 {
     public class Player
     {
-        public Guid GameUserId { get; set; }
-        public string Name { get; set; }
+        public Player(Guid gameUserId, string name)
+        {
+            GameUserId = gameUserId;
+            Name = name;
+        }
+
+        public Guid GameUserId { get; }
+        public string Name { get; }
     }
 }
