@@ -29,6 +29,8 @@ namespace ScoreFourServer.WebApi
 
         public IConfiguration Configuration { get; }
 
+        public string StorageConnectionString { get; set; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -64,8 +66,8 @@ namespace ScoreFourServer.WebApi
                 sp.GetService<IWaitingPlayerAdapter>(),
                 sp.GetService<GameManagerFactory>()
                 ));
-            services.AddScoped<IGameMovementAdapter>(sp => new Adapters.Azure.GameMovementAdapter(Configuration.GetConnectionString("StorageConnectionString")));
-            services.AddScoped<IGameRoomAdapter>(sp => new Adapters.Azure.GameRoomAdapter(Configuration.GetConnectionString("StorageConnectionString")));
+            services.AddScoped<IGameMovementAdapter>(sp => new Adapters.Azure.GameMovementAdapter(StorageConnectionString));
+            services.AddScoped<IGameRoomAdapter>(sp => new Adapters.Azure.GameRoomAdapter(StorageConnectionString));
             services.AddScoped<IWaitingPlayerAdapter>(sp => new Adapters.OnMemory.WaitingPlayerAdapter());
         }
 
@@ -75,6 +77,13 @@ namespace ScoreFourServer.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                // Obtain keys from the user secrets
+                StorageConnectionString = Configuration["ScoreFourServerDev:StorageConnectionString"];
+            }
+            else
+            {
+                StorageConnectionString = Configuration.GetConnectionString("StorageConnectionString");
             }
 
             app.UseSwagger();
