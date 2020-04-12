@@ -7,6 +7,7 @@ using ScoreFourServer.Domain.ValueObject;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -65,7 +66,7 @@ namespace ScoreFourServer.Adapters.Azure
                             TableQuery.GenerateFilterConditionForGuid(nameof(GameRoomTableEntity.Player2GameUserId), QueryComparisons.Equal, player.GameUserId)
                             ),
                         TableOperators.And,
-                        TableQuery.GenerateFilterConditionForInt(nameof(GameRoomTableEntity.GameRoomStatus), QueryComparisons.Equal, (int)GameRoomStatus.Created)
+                        TableQuery.GenerateFilterCondition(nameof(GameRoomTableEntity.GameRoomStatus), QueryComparisons.Equal, GameRoomStatus.Created.ToString())
                         ));
                 var entity = await Tools.StorageTableTool.GetEntitiesAsync(table, query, cancellationToken)
                     .OrderByDescending(m => m.Timestamp)
