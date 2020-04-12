@@ -1,16 +1,14 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Microsoft.Azure.Storage;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 
 namespace ScoreFourServer.Adapters.Azure.Tools
 {
-    public class StorageTableTool
+    public class StorageTool
     {
-        public static CloudStorageAccount CreateStorageAccountFromConnectionString(string storageConnectionString)
+        public static CloudStorageAccount CreateStorageAccount(string storageConnectionString)
         {
             CloudStorageAccount storageAccount;
             try
@@ -29,21 +27,6 @@ namespace ScoreFourServer.Adapters.Azure.Tools
             }
 
             return storageAccount;
-        }
-
-        public static async IAsyncEnumerable<TEntity> GetEntitiesAsync<TEntity>(CloudTable table, TableQuery<TEntity> tableQuery, [EnumeratorCancellation]CancellationToken cancellationToken) where TEntity : class, ITableEntity, new()
-        {
-            TableContinuationToken token = null;
-            do
-            {
-                var seg = await table.ExecuteQuerySegmentedAsync(tableQuery, token);
-                token = seg.ContinuationToken;
-                foreach (var item in seg)
-                {
-                    yield return item;
-                }
-
-            } while (token != null && !cancellationToken.IsCancellationRequested);
         }
     }
 }

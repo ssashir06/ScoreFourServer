@@ -68,7 +68,7 @@ namespace ScoreFourServer.WebApi
                 ));
             services.AddScoped<IGameMovementAdapter>(sp => new Adapters.Azure.GameMovementAdapter(StorageConnectionString));
             services.AddScoped<IGameRoomAdapter>(sp => new Adapters.Azure.GameRoomAdapter(StorageConnectionString));
-            services.AddScoped<IWaitingPlayerAdapter>(sp => new Adapters.OnMemory.WaitingPlayerAdapter());
+            services.AddScoped<IWaitingPlayerAdapter>(sp => new Adapters.Azure.WaitingPlayerAdapter(StorageConnectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

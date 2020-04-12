@@ -19,7 +19,7 @@ namespace ScoreFourServer.Adapters.Azure
 
         public GameRoomAdapter(string connectionString)
         {
-            StorageAccount = Tools.StorageTableTool.CreateStorageAccountFromConnectionString(connectionString);
+            StorageAccount = Tools.CosmosTableTool.CreateStorageAccount(connectionString);
         }
 
         public CloudStorageAccount StorageAccount { get; }
@@ -43,7 +43,7 @@ namespace ScoreFourServer.Adapters.Azure
                         TableOperators.And,
                         TableQuery.GenerateFilterConditionForGuid(nameof(GameRoomTableEntity.GameRoomId), QueryComparisons.Equal, gameRoomId)
                         ));
-                var entity = await Tools.StorageTableTool.GetEntitiesAsync(table, query, cancellationToken).FirstOrDefaultAsync(cancellationToken);
+                var entity = await Tools.CosmosTableTool.GetEntitiesAsync(table, query, cancellationToken).FirstOrDefaultAsync(cancellationToken);
                 return entity != null ? (GameRoom)entity : null;
             }
             catch (StorageException ex)
@@ -68,7 +68,7 @@ namespace ScoreFourServer.Adapters.Azure
                         TableOperators.And,
                         TableQuery.GenerateFilterCondition(nameof(GameRoomTableEntity.GameRoomStatus), QueryComparisons.Equal, GameRoomStatus.Created.ToString())
                         ));
-                var entity = await Tools.StorageTableTool.GetEntitiesAsync(table, query, cancellationToken)
+                var entity = await Tools.CosmosTableTool.GetEntitiesAsync(table, query, cancellationToken)
                     .OrderByDescending(m => m.Timestamp)
                     .FirstOrDefaultAsync(cancellationToken);
                 return entity != null ? (GameRoom)entity : null;
