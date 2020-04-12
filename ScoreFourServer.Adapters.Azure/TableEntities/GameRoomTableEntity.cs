@@ -38,16 +38,6 @@ namespace ScoreFourServer.Adapters.Azure.TableEntities
             mapper = configuration.CreateMapper();
         }
 
-        public Guid GameRoomId { get; set; }
-        public string Name { get; set; }
-        public Guid Player1GameUserId { get; set; }
-        public string Player1Name { get; set; }
-        public Guid Player2GameUserId { get; set; }
-        public string Player2Name { get; set; }
-        public DateTimeOffset CreateDate { get; set; }
-        public string GameRoomStatus { get; set; }
-        public int? Winner { get; set; }
-
         public static explicit operator GameRoomTableEntity(GameRoom obj)
         {
             return mapper.Map<GameRoom, GameRoomTableEntity>(obj);
@@ -57,5 +47,15 @@ namespace ScoreFourServer.Adapters.Azure.TableEntities
         {
             return mapper.Map<GameRoomTableEntity, GameRoom>(obj);
         }
+
+        public Guid GameRoomId { get; set; }
+        public string Name { get; set; }
+        public Guid Player1GameUserId { get; set; }
+        public string Player1Name { get; set; }
+        public Guid Player2GameUserId { get; set; }
+        public string Player2Name { get; set; }
+        public DateTimeOffset CreateDate { get; set; }
+        public string GameRoomStatus { get; set; }
+        public int? Winner { get; set; }
     }
 }

@@ -51,7 +51,7 @@ namespace ScoreFourServer.Domain.Models
                 throw new GameException("Wrong game counter number");
             }
 
-            await gameMovementAdapter.SaveAsync(GameRoom, movement, cancellationToken);
+            await gameMovementAdapter.SaveAsync(movement, cancellationToken);
 
             if (GameRoom.GameRoomStatus == GameRoomStatus.Created)
             {

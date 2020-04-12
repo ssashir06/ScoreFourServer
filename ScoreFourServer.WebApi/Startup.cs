@@ -64,7 +64,7 @@ namespace ScoreFourServer.WebApi
                 sp.GetService<IWaitingPlayerAdapter>(),
                 sp.GetService<GameManagerFactory>()
                 ));
-            services.AddScoped<IGameMovementAdapter>(sp => new Adapters.OnMemory.GameMovementAdapter());
+            services.AddScoped<IGameMovementAdapter>(sp => new Adapters.Azure.GameMovementAdapter(Configuration.GetConnectionString("StorageConnectionString")));
             services.AddScoped<IGameRoomAdapter>(sp => new Adapters.Azure.GameRoomAdapter(Configuration.GetConnectionString("StorageConnectionString")));
             services.AddScoped<IWaitingPlayerAdapter>(sp => new Adapters.OnMemory.WaitingPlayerAdapter());
         }

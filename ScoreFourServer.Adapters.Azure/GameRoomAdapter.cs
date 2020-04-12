@@ -24,7 +24,7 @@ namespace ScoreFourServer.Adapters.Azure
 
         public CloudStorageAccount StorageAccount { get; }
 
-        public async Task<CloudTable> GetTable(CancellationToken cancellationToken)
+        private async Task<CloudTable> GetTable(CancellationToken cancellationToken)
         {
             var tableClient = StorageAccount.CreateCloudTableClient(new TableClientConfiguration());
             var table = tableClient.GetTableReference(tableName);

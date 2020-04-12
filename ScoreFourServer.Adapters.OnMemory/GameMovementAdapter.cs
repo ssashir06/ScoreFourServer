@@ -24,7 +24,7 @@ namespace ScoreFourServer.Adapters.OnMemory
             }
         }
 
-        public async Task SaveAsync(GameRoom gameRoom, Movement movement, CancellationToken cancellationToken)
+        public async Task SaveAsync(Movement movement, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
             lock (Movements)

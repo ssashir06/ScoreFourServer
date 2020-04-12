@@ -10,7 +10,7 @@ namespace ScoreFourServer.Domain.Adapters
 {
     public interface IGameMovementAdapter
     {
-        Task SaveAsync(GameRoom gameRoom, Movement movement, CancellationToken cancellationToken);
+        Task SaveAsync(Movement movement, CancellationToken cancellationToken);
         Task<Movement> GetAsync(GameRoom gameRoom, int counter, CancellationToken cancellationToken);
         Task<IList<Movement>> GetListAsync(GameRoom gameRoom, CancellationToken cancellationToken);
     }
