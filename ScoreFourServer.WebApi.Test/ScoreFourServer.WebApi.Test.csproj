@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ScoreFourServer.Adapters.OnMemory\ScoreFourServer.Adapters.OnMemory.csproj" />
     <ProjectReference Include="..\ScoreFourServer.WebApi\ScoreFourServer.WebApi.csproj" />
   </ItemGroup>
 
