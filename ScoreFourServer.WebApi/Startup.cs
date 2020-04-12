@@ -80,17 +80,17 @@ namespace ScoreFourServer.WebApi
 
                 // Obtain keys from the user secrets
                 StorageConnectionString = Configuration["ScoreFourServerDev:StorageConnectionString"];
+
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ScoreFourServer API V1");
+                });
             }
             else
             {
                 StorageConnectionString = Configuration.GetConnectionString("StorageConnectionString");
             }
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ScoreFourServer API V1");
-            });
 
             app.UseHttpsRedirection();
 
