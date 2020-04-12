@@ -32,11 +32,7 @@ namespace ScoreFourServer.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> AddGamePlayer(GamePlayerPutVM gamePlayer)
         {
-            var player = new Player
-            {
-                GameUserId = gamePlayer.GameUserId,
-                Name = gamePlayer.Name,
-            };
+            var player = new Player(gamePlayer.GameUserId, gamePlayer.Name);
             var ct = HttpContext.RequestAborted;
             await playerMatchingService.AddGamePlayer(player, ct);
 
@@ -48,10 +44,7 @@ namespace ScoreFourServer.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         public async Task<IActionResult> MatchAsync(Guid gameUserId)
         {
-            var player = new Player
-            {
-                GameUserId = gameUserId,
-            };
+            var player = new Player(gameUserId, null);
             var ct = HttpContext.RequestAborted;
             var gameRoom = await playerMatchingService.MatchAsync(player, ct);
             if (gameRoom != null)

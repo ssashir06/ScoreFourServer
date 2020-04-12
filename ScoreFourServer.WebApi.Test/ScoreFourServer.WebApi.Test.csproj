@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ScoreFourServer.Adapters.OnMemory\ScoreFourServer.Adapters.OnMemory.csproj" />
     <ProjectReference Include="..\ScoreFourServer.WebApi\ScoreFourServer.WebApi.csproj" />
   </ItemGroup>
 

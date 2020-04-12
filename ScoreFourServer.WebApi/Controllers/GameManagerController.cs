@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ScoreFourServer.Domain.Adapter;
+using ScoreFourServer.Domain.Adapters;
 using ScoreFourServer.Domain.Exceptions;
 using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.ValueObject;

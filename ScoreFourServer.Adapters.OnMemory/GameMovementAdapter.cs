@@ -1,7 +1,7 @@
-﻿using ScoreFourServer.Domain.Adapter;
+﻿using ScoreFourServer.Domain.Adapters;
 using ScoreFourServer.Domain.Entities;
 using ScoreFourServer.Domain.ValueObject;
-using ScoreFourServer.OnMemory.Tools;
+using ScoreFourServer.Adapters.OnMemory.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScoreFourServer.OnMemory.Adapter
+namespace ScoreFourServer.Adapters.OnMemory
 {
     public class GameMovementAdapter : IGameMovementAdapter
     {
@@ -24,11 +24,12 @@ namespace ScoreFourServer.OnMemory.Adapter
             }
         }
 
-        public async Task AddAsync(GameRoom gameRoom, Movement movement, CancellationToken cancellationToken)
+        public async Task SaveAsync(Movement movement, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
             lock (Movements)
             {
+                Movements.RemoveAll(m => m.GameRoomId == movement.GameRoomId && m.Counter == movement.Counter);
                 Movements.Add(movement);
             }
         }

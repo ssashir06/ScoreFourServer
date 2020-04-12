@@ -10,10 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ScoreFourServer.Domain.Adapter;
+using ScoreFourServer.Domain.Adapters;
 using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.Services;
-using ScoreFourServer.OnMemory.Adapter;
 using Microsoft.OpenApi.Models;
 
 namespace ScoreFourServer.WebApi
@@ -29,6 +28,8 @@ namespace ScoreFourServer.WebApi
         }
 
         public IConfiguration Configuration { get; }
+
+        public string StorageConnectionString { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -65,9 +66,9 @@ namespace ScoreFourServer.WebApi
                 sp.GetService<IWaitingPlayerAdapter>(),
                 sp.GetService<GameManagerFactory>()
                 ));
-            services.AddScoped<IGameMovementAdapter>(sp => new GameMovementAdapter());
-            services.AddScoped<IGameRoomAdapter>(sp => new GameRoomAdapter());
-            services.AddScoped<IWaitingPlayerAdapter>(sp => new WaitingPlayerAdapter());
+            services.AddScoped<IGameMovementAdapter>(sp => new Adapters.Azure.GameMovementAdapter(StorageConnectionString));
+            services.AddScoped<IGameRoomAdapter>(sp => new Adapters.Azure.GameRoomAdapter(StorageConnectionString));
+            services.AddScoped<IWaitingPlayerAdapter>(sp => new Adapters.Azure.WaitingPlayerAdapter(StorageConnectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,6 +77,13 @@ namespace ScoreFourServer.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                // Obtain keys from the user secrets
+                StorageConnectionString = Configuration["ScoreFourServerDev:StorageConnectionString"];
+            }
+            else
+            {
+                StorageConnectionString = Configuration.GetConnectionString("StorageConnectionString");
             }
 
             app.UseSwagger();

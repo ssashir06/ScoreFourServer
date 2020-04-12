@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScoreFourServer.Domain.Adapter
+namespace ScoreFourServer.Domain.Adapters
 {
     public interface IGameMovementAdapter
     {
-        Task AddAsync(GameRoom gameRoom, Movement movement, CancellationToken cancellationToken);
+        Task SaveAsync(Movement movement, CancellationToken cancellationToken);
         Task<Movement> GetAsync(GameRoom gameRoom, int counter, CancellationToken cancellationToken);
         Task<IList<Movement>> GetListAsync(GameRoom gameRoom, CancellationToken cancellationToken);
     }

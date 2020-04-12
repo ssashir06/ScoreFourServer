@@ -1,4 +1,4 @@
-﻿using ScoreFourServer.Domain.Adapter;
+﻿using ScoreFourServer.Domain.Adapters;
 using ScoreFourServer.Domain.Entities;
 using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.ValueObject;
@@ -44,13 +44,13 @@ namespace ScoreFourServer.Domain.Services
                     Players = new[] { waitingPlayer, player },
                     GameRoomStatus = GameRoomStatus.Created,
                 };
-                await gameRoomAdapter.AddAsync(newGameRoom, cancellationToken);
+                await gameRoomAdapter.SaveAsync(newGameRoom, cancellationToken);
             }
         }
 
         public async Task<GameRoom> MatchAsync(Player player, CancellationToken cancellationToken)
         {
-            var createdGameRoom = await gameRoomAdapter.GetLatestByPlayerAsync(player, cancellationToken);
+            var createdGameRoom = await gameRoomAdapter.GetLatestCreatedByPlayerAsync(player, cancellationToken);
             if (createdGameRoom != null)
             {
                 var gameManager = await gameManagerFactory.FactoryAsync(createdGameRoom, cancellationToken);

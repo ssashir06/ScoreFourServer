@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScoreFourServer.OnMemory.Tools
+namespace ScoreFourServer.Adapters.OnMemory.Tools
 {
     class Dummy
     {
