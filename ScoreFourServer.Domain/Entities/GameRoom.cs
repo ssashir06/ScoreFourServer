@@ -9,7 +9,7 @@ namespace ScoreFourServer.Domain.Entities
     {
         public Guid GameRoomId { get; set; }
         public string Name { get; set; }
-        public IList<Player> Players { get; set; }
+        public IList<Client> Players { get; set; }
         public DateTimeOffset CreateDate { get; set; }
         public GameRoomStatus GameRoomStatus { get; set; }
         public int? Winner { get; set; }

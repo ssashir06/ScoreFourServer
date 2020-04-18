@@ -31,13 +31,13 @@ namespace ScoreFourServer.Adapters.Azure.TableEntities
         public static explicit operator Movement(MovementTableEntity obj)
         {
             return new Movement(
-                obj.X, obj.Y, obj.Counter, obj.PlayerId, obj.GameRoomId, obj.CreateDate);
+                obj.X, obj.Y, obj.Counter, obj.GameUserId, obj.GameRoomId, obj.CreateDate);
         }
 
         public int X { get; set; }
         public int Y { get; set; }
         public int Counter { get; set; }
-        public Guid PlayerId { get; set; }
+        public Guid GameUserId { get; set; }
         public Guid GameRoomId { get; set; }
         public DateTimeOffset CreateDate { get; set; }
     }

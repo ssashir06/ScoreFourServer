@@ -14,23 +14,26 @@ namespace ScoreFourServer.Domain.Services
     {
         private readonly IGameRoomAdapter gameRoomAdapter;
         private readonly IWaitingPlayerAdapter waitingPlayerAdapter;
+        private readonly IClientTokenAdapter clientTokenAdapter;
         private readonly GameManagerFactory gameManagerFactory;
 
         public PlayerMatchingService(
             IGameRoomAdapter gameRoomAdapter,
             IWaitingPlayerAdapter waitingPlayerAdapter,
+            IClientTokenAdapter clientTokenAdapter,
             GameManagerFactory gameManagerFactory
             )
         {
             this.gameRoomAdapter = gameRoomAdapter;
             this.waitingPlayerAdapter = waitingPlayerAdapter;
+            this.clientTokenAdapter = clientTokenAdapter;
             this.gameManagerFactory = gameManagerFactory;
         }
 
-        public async Task AddGamePlayer(Player player, CancellationToken cancellationToken)
+        public async Task AddGamePlayer(Client player, CancellationToken cancellationToken)
         {
             var waitingPlayer = await this.waitingPlayerAdapter.DequeueAsync(cancellationToken);
-            if (waitingPlayer == null || waitingPlayer.GameUserId == player.GameUserId)
+            if (waitingPlayer == null || waitingPlayer.ClientId == player.ClientId)
             {
                 await waitingPlayerAdapter.EnqueueAsync(player, DateTimeOffset.UtcNow + TimeSpan.FromMinutes(10), cancellationToken);
             }
@@ -48,7 +51,7 @@ namespace ScoreFourServer.Domain.Services
             }
         }
 
-        public async Task<GameRoom> MatchAsync(Player player, CancellationToken cancellationToken)
+        public async Task<(GameRoom, ClientToken)> MatchAsync(Client player, CancellationToken cancellationToken)
         {
             var createdGameRoom = await gameRoomAdapter.GetLatestCreatedByPlayerAsync(player, cancellationToken);
             if (createdGameRoom != null)
@@ -57,11 +60,14 @@ namespace ScoreFourServer.Domain.Services
                 await gameManager.UpdateGameRoomStatusAsync(cancellationToken);
                 if (gameManager.GameRoom.GameRoomStatus == GameRoomStatus.Created)
                 {
-                    return createdGameRoom;
+                    var token = new ClientToken(player.GameUserId, player.ClientId, Guid.NewGuid(), DateTimeOffset.UtcNow + TimeSpan.FromHours(10));
+                    await clientTokenAdapter.SaveAsync(token, cancellationToken);
+
+                    return (createdGameRoom, token);
                 }
             }
 
-            return null;
+            return (null, null);
         }
     }
 }

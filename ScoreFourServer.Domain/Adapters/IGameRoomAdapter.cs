@@ -11,7 +11,7 @@ namespace ScoreFourServer.Domain.Adapters
     public interface IGameRoomAdapter
     {
         Task<GameRoom> GetAsync(Guid gameRoomId, CancellationToken cancellationToken);
-        Task<GameRoom> GetLatestCreatedByPlayerAsync(Player player, CancellationToken cancellationToken);
+        Task<GameRoom> GetLatestCreatedByPlayerAsync(Client player, CancellationToken cancellationToken);
         Task SaveAsync(GameRoom gameRoom, CancellationToken cancellationToken);
     }
 }

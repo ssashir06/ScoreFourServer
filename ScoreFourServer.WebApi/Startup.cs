@@ -14,6 +14,7 @@ using ScoreFourServer.Domain.Adapters;
 using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.Services;
 using Microsoft.OpenApi.Models;
+using ScoreFourServer.WebApi.ActionFilters;
 
 namespace ScoreFourServer.WebApi
 {
@@ -64,11 +65,16 @@ namespace ScoreFourServer.WebApi
             services.AddScoped(sp => new PlayerMatchingService(
                 sp.GetService<IGameRoomAdapter>(),
                 sp.GetService<IWaitingPlayerAdapter>(),
+                sp.GetService<IClientTokenAdapter>(),
                 sp.GetService<GameManagerFactory>()
+                ));
+            services.AddScoped(sp => new ClientTokenActionFilterAttribute(
+                sp.GetService<IClientTokenAdapter>()
                 ));
             services.AddScoped<IGameMovementAdapter>(sp => new Adapters.Azure.GameMovementAdapter(StorageConnectionString));
             services.AddScoped<IGameRoomAdapter>(sp => new Adapters.Azure.GameRoomAdapter(StorageConnectionString));
             services.AddScoped<IWaitingPlayerAdapter>(sp => new Adapters.Azure.WaitingPlayerAdapter(StorageConnectionString));
+            services.AddScoped<IClientTokenAdapter>(sp => new Adapters.Azure.ClientTokenAdapter(StorageConnectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

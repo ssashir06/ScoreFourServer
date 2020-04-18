@@ -24,7 +24,7 @@ namespace ScoreFourServer.Adapters.Azure
 
         public CloudStorageAccount StorageAccount { get; }
 
-        private async Task<CloudTable> GetTable(CancellationToken cancellationToken)
+        private async Task<CloudTable> GetTableAsync(CancellationToken cancellationToken)
         {
             var tableClient = StorageAccount.CreateCloudTableClient(new TableClientConfiguration());
             var table = tableClient.GetTableReference(tableName);
@@ -36,7 +36,7 @@ namespace ScoreFourServer.Adapters.Azure
         {
             try
             {
-                var table = await GetTable(cancellationToken);
+                var table = await GetTableAsync(cancellationToken);
                 var query = new TableQuery<MovementTableEntity>()
                     .Where(TableQuery.CombineFilters(
                         TableQuery.GenerateFilterCondition(nameof(MovementTableEntity.PartitionKey), QueryComparisons.Equal, gameRoom.GameRoomId.ToString("D")),
@@ -57,7 +57,7 @@ namespace ScoreFourServer.Adapters.Azure
         {
             try
             {
-                var table = await GetTable(cancellationToken);
+                var table = await GetTableAsync(cancellationToken);
                 var query = new TableQuery<MovementTableEntity>()
                     .Where(
                         TableQuery.GenerateFilterCondition(nameof(MovementTableEntity.PartitionKey), QueryComparisons.Equal, gameRoom.GameRoomId.ToString("D"))
@@ -78,7 +78,7 @@ namespace ScoreFourServer.Adapters.Azure
             {
                 var entity = (MovementTableEntity)movement;
                 var operation = TableOperation.InsertOrMerge(entity);
-                var table = await GetTable(cancellationToken);
+                var table = await GetTableAsync(cancellationToken);
                 var result = await table.ExecuteAsync(operation, cancellationToken);
                 var inserted = result.Result as MovementTableEntity;
             }

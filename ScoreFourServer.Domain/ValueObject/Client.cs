@@ -4,15 +4,17 @@ using System.Text;
 
 namespace ScoreFourServer.Domain.ValueObject
 {
-    public class Player
+    public class Client
     {
-        public Player(Guid gameUserId, string name)
+        public Client(Guid gameUserId, Guid clientId, string name)
         {
             GameUserId = gameUserId;
+            ClientId = clientId;
             Name = name;
         }
 
         public Guid GameUserId { get; }
+        public Guid ClientId { get; }
         public string Name { get; }
     }
 }

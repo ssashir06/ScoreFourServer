@@ -6,6 +6,7 @@ using ScoreFourServer.Domain.Exceptions;
 using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.ValueObject;
 using ScoreFourServer.WebApi.ViewModel;
+using ScoreFourServer.WebApi.ActionFilters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -15,21 +16,25 @@ using System.Threading.Tasks;
 namespace ScoreFourServer.WebApi.Controllers
 {
     [ApiController]
+    [ServiceFilter(typeof(ClientTokenActionFilterAttribute))]
     [Route("api/v1/[controller]")]
     public class GameManagerController : ControllerBase
     {
         private readonly ILogger<GameManagerController> logger;
         private readonly IGameRoomAdapter gameRoomAdapter;
+        private readonly IClientTokenAdapter clientTokenAdapter;
         private readonly GameManagerFactory gameManagerFactory;
 
         public GameManagerController(
             ILogger<GameManagerController> logger,
             IGameRoomAdapter gameRoomAdapter,
+            IClientTokenAdapter clientTokenAdapter,
             GameManagerFactory gameManagerFactory
             )
         {
             this.logger = logger;
             this.gameRoomAdapter = gameRoomAdapter;
+            this.clientTokenAdapter = clientTokenAdapter;
             this.gameManagerFactory = gameManagerFactory;
         }
 
@@ -47,12 +52,13 @@ namespace ScoreFourServer.WebApi.Controllers
             var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
             try
             {
-                var playerId = gameRoom.Players[movementPatch.PlayerNumber - 1].GameUserId;
+                var gameUserId = gameRoom.Players[movementPatch.PlayerNumber - 1].GameUserId;
                 var movement = new Movement(
                     movementPatch.X, movementPatch.Y, movementPatch.Counter,
-                    playerId, gameRoomId, DateTimeOffset.Now
+                    gameUserId, gameRoomId, DateTimeOffset.Now
                     );
-                await gameManager.MoveAsync(movement, ct);
+                var clientToken = await clientTokenAdapter.GetAsync((Guid)HttpContext.Items["ClientTokenGuid"], ct);
+                await gameManager.MoveAsync(movement, clientToken, ct);
             }
             catch (GameException ex)
             {
@@ -119,7 +125,8 @@ namespace ScoreFourServer.WebApi.Controllers
                 return BadRequest("Invalid game room number.");
             }
             var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
-            await gameManager.UpdateWinnerAsync(playerNumber, ct);
+            var clientToken = await clientTokenAdapter.GetAsync((Guid)HttpContext.Items["ClientTokenGuid"], ct);
+            await gameManager.UpdateWinnerAsync(playerNumber, clientToken, ct);
             return Ok();
         }
 
@@ -135,7 +142,8 @@ namespace ScoreFourServer.WebApi.Controllers
                 return BadRequest("Invalid game room number.");
             }
             var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
-            await gameManager.LeaveGameAsync(playerNumber, ct);
+            var clientToken = await clientTokenAdapter.GetAsync((Guid)HttpContext.Items["ClientTokenGuid"], ct);
+            await gameManager.LeaveGameAsync(playerNumber, clientToken, ct);
             return Ok();
         }
     }

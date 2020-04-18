@@ -32,17 +32,26 @@ namespace ScoreFourServer.Domain.Models
         public int PlayerNumber { get; set; }
         public int Counter { get; set; }
 
-        public async Task MoveAsync(Movement movement, CancellationToken cancellationToken)
+        public async Task MoveAsync(Movement movement, ClientToken clientToken, CancellationToken cancellationToken)
         {
             if (movement == null)
             {
                 throw new ArgumentNullException(nameof(movement));
             }
+            if (clientToken== null || clientToken.IsExpired)
+            {
+                throw new ArgumentException(nameof(clientToken));
+            }
+            if (movement.GameUserId != clientToken.GameUserId)
+            {
+                throw new ArgumentException(nameof(clientToken));
+            }
             if (this.GameRoom.GameRoomId != movement.GameRoomId)
             {
                 throw new GameException("Wrong game room id");
             }
-            if (this.GameRoom.Players[this.PlayerNumber - 1].GameUserId != movement.PlayerId)
+            if (this.GameRoom.Players[this.PlayerNumber - 1].GameUserId != movement.GameUserId
+                || this.GameRoom.Players[movement.Counter % 2].GameUserId != movement.GameUserId)
             {
                 throw new GameException("Wrong game player id");
             }
@@ -79,7 +88,7 @@ namespace ScoreFourServer.Domain.Models
 
         private async Task CheckTimeout(CancellationToken cancellationToken)
         {
-            if (GameRoom.GameRoomStatus == GameRoomStatus.TimedOut)
+            if (GameRoom.GameRoomStatus == GameRoomStatus.Timedout)
             {
                 return;
             }
@@ -89,22 +98,27 @@ namespace ScoreFourServer.Domain.Models
             if (!movements.Any()
                 && now - this.GameRoom.CreateDate > TimeSpan.FromMinutes(5))
             {
-                GameRoom.GameRoomStatus = GameRoomStatus.TimedOut;
+                GameRoom.GameRoomStatus = GameRoomStatus.Timedout;
             }
             if (movements.Any()
                 && now - movements.Max(m => m.CreateDate) > TimeSpan.FromMinutes(5))
             {
-                GameRoom.GameRoomStatus = GameRoomStatus.TimedOut;
+                GameRoom.GameRoomStatus = GameRoomStatus.Timedout;
             }
 
-            if (GameRoom.GameRoomStatus == GameRoomStatus.TimedOut)
+            if (GameRoom.GameRoomStatus == GameRoomStatus.Timedout)
             {
                 await gameRoomAdapter.SaveAsync(GameRoom, cancellationToken);
             }
         }
 
-        public async Task UpdateWinnerAsync(int playerNumber, CancellationToken ct)
+        public async Task UpdateWinnerAsync(int playerNumber, ClientToken clientToken, CancellationToken ct)
         {
+            if (clientToken == null
+                || !GameRoom.Players.Select(m => m.GameUserId).Contains(clientToken.GameUserId))
+            {
+                throw new ArgumentException(nameof(clientToken));
+            }
             if (GameRoom.GameRoomStatus == GameRoomStatus.GameOver && GameRoom.Winner == playerNumber)
             {
                 return;
@@ -119,9 +133,14 @@ namespace ScoreFourServer.Domain.Models
             await gameRoomAdapter.SaveAsync(GameRoom, ct);
         }
 
-        public async Task LeaveGameAsync(int playerNumber, CancellationToken ct)
+        public async Task LeaveGameAsync(int playerNumber, ClientToken clientToken, CancellationToken ct)
         {
-            if (new[] { GameRoomStatus.GameOver, GameRoomStatus.TimedOut }.Contains(GameRoom.GameRoomStatus))
+            if (clientToken ==null
+                || GameRoom.Players[playerNumber-1].GameUserId != clientToken.GameUserId)
+            {
+                throw new ArgumentException(nameof(clientToken));
+            }
+            if (new[] { GameRoomStatus.GameOver, GameRoomStatus.Timedout }.Contains(GameRoom.GameRoomStatus))
             {
                 return;
             }

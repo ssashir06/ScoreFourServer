@@ -6,12 +6,12 @@ namespace ScoreFourServer.Domain.ValueObject
 {
     public class Movement
     {
-        public Movement(int x, int y, int counter, Guid playerId, Guid gameRoomId, DateTimeOffset createDate)
+        public Movement(int x, int y, int counter, Guid gameUserId, Guid gameRoomId, DateTimeOffset createDate)
         {
             this.X = x;
             this.Y = y;
             this.Counter = counter;
-            this.PlayerId = playerId;
+            this.GameUserId = gameUserId;
             this.GameRoomId = gameRoomId;
             this.CreateDate = createDate;
         }
@@ -19,7 +19,7 @@ namespace ScoreFourServer.Domain.ValueObject
         public int X { get; }
         public int Y { get; }
         public int Counter { get; }
-        public Guid PlayerId { get; }
+        public Guid GameUserId { get; }
         public Guid GameRoomId { get; }
         public DateTimeOffset CreateDate { get; }
     }
