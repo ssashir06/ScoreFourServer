@@ -57,8 +57,7 @@ namespace ScoreFourServer.WebApi.Controllers
                     movementPatch.X, movementPatch.Y, movementPatch.Counter,
                     gameUserId, gameRoomId, DateTimeOffset.Now
                     );
-                var clientToken = await clientTokenAdapter.GetAsync((Guid)HttpContext.Items["ClientTokenGuid"], ct);
-                await gameManager.MoveAsync(movement, clientToken, ct);
+                await gameManager.MoveAsync(movement, ct);
             }
             catch (GameException ex)
             {
@@ -113,10 +112,10 @@ namespace ScoreFourServer.WebApi.Controllers
             return new JsonResult(status);
         }
 
-        [HttpPut("{gameRoomId}/Winner")]
+        [HttpPut("{gameRoomId}/Winner/{GameUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> ReportWinnerAsync(Guid gameRoomId, [Range(1, 2)]int playerNumber)
+        public async Task<IActionResult> ReportWinnerAsync(Guid gameRoomId, Guid gameUserId)
         {
             var ct = HttpContext.RequestAborted;
             var gameRoom = await gameRoomAdapter.GetAsync(gameRoomId, ct);
@@ -124,16 +123,20 @@ namespace ScoreFourServer.WebApi.Controllers
             {
                 return BadRequest("Invalid game room number.");
             }
+            if (((ClientToken)HttpContext.Items["ClientToken"]).GameUserId != gameUserId)
+            {
+                // TODO: Validate game result
+                return BadRequest("Invalid game user id.");
+            }
             var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
-            var clientToken = await clientTokenAdapter.GetAsync((Guid)HttpContext.Items["ClientTokenGuid"], ct);
-            await gameManager.UpdateWinnerAsync(playerNumber, clientToken, ct);
+            await gameManager.UpdateWinnerAsync(gameUserId, ct);
             return Ok();
         }
 
-        [HttpPut("{gameRoomId}/Leave")]
+        [HttpPut("{gameRoomId}/Leave/{gameUserId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> LeaveGameAsync(Guid gameRoomId, [Range(1, 2)]int playerNumber)
+        public async Task<IActionResult> LeaveGameAsync(Guid gameRoomId, Guid gameUserId)
         {
             var ct = HttpContext.RequestAborted;
             var gameRoom = await gameRoomAdapter.GetAsync(gameRoomId, ct);
@@ -141,9 +144,12 @@ namespace ScoreFourServer.WebApi.Controllers
             {
                 return BadRequest("Invalid game room number.");
             }
+            if (((ClientToken)HttpContext.Items["ClientToken"]).GameUserId != gameUserId)
+            {
+                return BadRequest("Invalid game user id.");
+            }
             var gameManager = await gameManagerFactory.FactoryAsync(gameRoom, ct);
-            var clientToken = await clientTokenAdapter.GetAsync((Guid)HttpContext.Items["ClientTokenGuid"], ct);
-            await gameManager.LeaveGameAsync(playerNumber, clientToken, ct);
+            await gameManager.LeaveGameAsync(gameUserId, ct);
             return Ok();
         }
     }

@@ -32,19 +32,11 @@ namespace ScoreFourServer.Domain.Models
         public int PlayerNumber { get; set; }
         public int Counter { get; set; }
 
-        public async Task MoveAsync(Movement movement, ClientToken clientToken, CancellationToken cancellationToken)
+        public async Task MoveAsync(Movement movement, CancellationToken cancellationToken)
         {
             if (movement == null)
             {
                 throw new ArgumentNullException(nameof(movement));
-            }
-            if (clientToken== null || clientToken.IsExpired)
-            {
-                throw new ArgumentException(nameof(clientToken));
-            }
-            if (movement.GameUserId != clientToken.GameUserId)
-            {
-                throw new ArgumentException(nameof(clientToken));
             }
             if (this.GameRoom.GameRoomId != movement.GameRoomId)
             {
@@ -112,34 +104,24 @@ namespace ScoreFourServer.Domain.Models
             }
         }
 
-        public async Task UpdateWinnerAsync(int playerNumber, ClientToken clientToken, CancellationToken ct)
+        public async Task UpdateWinnerAsync(Guid gameUserId, CancellationToken ct)
         {
-            if (clientToken == null
-                || !GameRoom.Players.Select(m => m.GameUserId).Contains(clientToken.GameUserId))
+            if (!GameRoom.Players.Select(m => m.GameUserId).Contains(gameUserId))
             {
-                throw new ArgumentException(nameof(clientToken));
-            }
-            if (GameRoom.GameRoomStatus == GameRoomStatus.GameOver && GameRoom.Winner == playerNumber)
-            {
-                return;
+                throw new ArgumentException(nameof(gameUserId));
             }
             if (GameRoom.GameRoomStatus != GameRoomStatus.Started)
             {
-                throw new ArgumentException(nameof(playerNumber));
+                throw new GameException("Game is not started.");
             }
 
             GameRoom.GameRoomStatus = GameRoomStatus.GameOver;
-            GameRoom.Winner = PlayerNumber;
+            GameRoom.WinnerGameUserId = gameUserId;
             await gameRoomAdapter.SaveAsync(GameRoom, ct);
         }
 
-        public async Task LeaveGameAsync(int playerNumber, ClientToken clientToken, CancellationToken ct)
+        public async Task LeaveGameAsync(Guid gameUserId, CancellationToken ct)
         {
-            if (clientToken ==null
-                || GameRoom.Players[playerNumber-1].GameUserId != clientToken.GameUserId)
-            {
-                throw new ArgumentException(nameof(clientToken));
-            }
             if (new[] { GameRoomStatus.GameOver, GameRoomStatus.Timedout }.Contains(GameRoom.GameRoomStatus))
             {
                 return;

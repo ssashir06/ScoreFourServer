@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace ScoreFourServer.WebApi.ViewModel
 {
-    public class GameRoomGetVM
+    public class Player
     {
-        public Guid GameRoomId { get; set; }
         public string Name { get; set; }
-        public IList<Player> Players { get; set; }
+        public Guid GameUserId { get; set; }
     }
 }

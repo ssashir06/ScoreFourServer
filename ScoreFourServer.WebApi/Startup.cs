@@ -35,7 +35,10 @@ namespace ScoreFourServer.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers(options =>
+            {
+                options.Filters.Add(typeof(RequestTraceActionFilterAttribute));
+            });
 
 
             // Cors
@@ -70,6 +73,8 @@ namespace ScoreFourServer.WebApi
                 ));
             services.AddScoped(sp => new ClientTokenActionFilterAttribute(
                 sp.GetService<IClientTokenAdapter>()
+                ));
+            services.AddScoped(sp => new RequestTraceActionFilterAttribute(
                 ));
             services.AddScoped<IGameMovementAdapter>(sp => new Adapters.Azure.GameMovementAdapter(StorageConnectionString));
             services.AddScoped<IGameRoomAdapter>(sp => new Adapters.Azure.GameRoomAdapter(StorageConnectionString));

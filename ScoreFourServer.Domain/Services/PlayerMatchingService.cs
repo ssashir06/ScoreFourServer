@@ -4,6 +4,7 @@ using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.ValueObject;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,7 +61,9 @@ namespace ScoreFourServer.Domain.Services
                 await gameManager.UpdateGameRoomStatusAsync(cancellationToken);
                 if (gameManager.GameRoom.GameRoomStatus == GameRoomStatus.Created)
                 {
-                    var token = new ClientToken(player.GameUserId, player.ClientId, Guid.NewGuid(), DateTimeOffset.UtcNow + TimeSpan.FromHours(10));
+                    var token = new ClientToken(
+                        createdGameRoom.Players.First(m => m.ClientId == player.ClientId).GameUserId,
+                        player.ClientId, Guid.NewGuid(), DateTimeOffset.UtcNow + TimeSpan.FromHours(10));
                     await clientTokenAdapter.SaveAsync(token, cancellationToken);
 
                     return (createdGameRoom, token);

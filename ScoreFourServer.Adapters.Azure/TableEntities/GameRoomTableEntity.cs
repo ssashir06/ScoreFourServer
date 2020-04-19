@@ -60,6 +60,6 @@ namespace ScoreFourServer.Adapters.Azure.TableEntities
         public string Player2Name { get; set; }
         public DateTimeOffset CreateDate { get; set; }
         public string GameRoomStatus { get; set; }
-        public int? Winner { get; set; }
+        public Guid? WinnerGameUserId { get; set; }
     }
 }

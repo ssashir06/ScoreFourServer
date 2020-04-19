@@ -57,7 +57,11 @@ namespace ScoreFourServer.WebApi.Controllers
                     {
                         GameRoomId = gameRoom.GameRoomId,
                         Name = gameRoom.Name,
-                        Players = gameRoom.Players.Select(m => m.Name).ToArray(),
+                        Players = gameRoom.Players.Select(m => new Player
+                        {
+                            GameUserId = m.GameUserId,
+                            Name = m.Name,
+                        }).ToArray(),
                     },
                     Token = token
                 });

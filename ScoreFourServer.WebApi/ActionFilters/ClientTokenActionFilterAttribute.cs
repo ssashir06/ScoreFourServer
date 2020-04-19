@@ -54,7 +54,7 @@ namespace ScoreFourServer.WebApi.ActionFilters
                 return;
             }
 
-            context.HttpContext.Items["ClientTokenGuid"] = clientToken;
+            context.HttpContext.Items["ClientToken"] = clientToken;
 
             await next();
         }
