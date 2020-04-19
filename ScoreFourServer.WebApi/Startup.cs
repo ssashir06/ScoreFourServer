@@ -15,6 +15,7 @@ using ScoreFourServer.Domain.Factories;
 using ScoreFourServer.Domain.Services;
 using Microsoft.OpenApi.Models;
 using ScoreFourServer.WebApi.ActionFilters;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ScoreFourServer.WebApi
 {
@@ -72,10 +73,12 @@ namespace ScoreFourServer.WebApi
                 sp.GetService<GameManagerFactory>()
                 ));
             services.AddScoped(sp => new ClientTokenActionFilterAttribute(
-                sp.GetService<IClientTokenAdapter>()
+                sp.GetService<IClientTokenAdapter>(),
+                sp.GetService<IMemoryCache>()
                 ));
             services.AddScoped(sp => new RequestTraceActionFilterAttribute(
                 ));
+            services.AddSingleton<IMemoryCache>(sp => new MemoryCache(new MemoryCacheOptions(), sp.GetService<ILoggerFactory>()));
             services.AddScoped<IGameMovementAdapter>(sp => new Adapters.Azure.GameMovementAdapter(StorageConnectionString));
             services.AddScoped<IGameRoomAdapter>(sp => new Adapters.Azure.GameRoomAdapter(StorageConnectionString));
             services.AddScoped<IWaitingPlayerAdapter>(sp => new Adapters.Azure.WaitingPlayerAdapter(StorageConnectionString));
