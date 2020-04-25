@@ -34,11 +34,13 @@ namespace ScoreFourServer.WebApi.Test
             services.AddScoped(sp => new PlayerMatchingService(
                 sp.GetService<IGameRoomAdapter>(),
                 sp.GetService<IWaitingPlayerAdapter>(),
+                sp.GetService<IClientTokenAdapter>(),
                 sp.GetService<GameManagerFactory>()
                 ));
             services.AddScoped<IGameMovementAdapter>(sp => new GameMovementAdapter());
             services.AddScoped<IGameRoomAdapter>(sp => new GameRoomAdapter());
             services.AddScoped<IWaitingPlayerAdapter>(sp => new WaitingPlayerAdapter());
+            services.AddScoped<IClientTokenAdapter>(sp => new ClientTokenAdapter());
 
             this.serviceProvider = services.BuildServiceProvider();
         }
@@ -89,8 +91,8 @@ namespace ScoreFourServer.WebApi.Test
             {
                 var actionResult = Assert.IsType<JsonResult>(results[1]);
                 var model = Assert.IsAssignableFrom<GameRoom>(actionResult.Value);
-                Assert.Equal(playerGuids[0], model.Players[0].GameUserId);
-                Assert.Equal(playerGuids[1], model.Players[1].GameUserId);
+                Assert.Equal(playerGuids[0], model.Players[0].ClientId);
+                Assert.Equal(playerGuids[1], model.Players[1].ClientId);
             }
         }
     }

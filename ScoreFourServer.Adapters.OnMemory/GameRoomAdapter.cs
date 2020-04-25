@@ -24,14 +24,14 @@ namespace ScoreFourServer.Adapters.OnMemory
             }
         }
 
-        public async Task<GameRoom> GetLatestCreatedByPlayerAsync(Player player, CancellationToken cancellationToken)
+        public async Task<GameRoom> GetLatestCreatedByPlayerAsync(Client player, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
             lock (GameRooms)
             {
                 return GameRooms
                     .OrderByDescending(m => m.CreateDate)
-                    .FirstOrDefault(m => m.Players.Select(p => p.GameUserId).Contains(player.GameUserId));
+                    .FirstOrDefault(m => m.Players.Select(p => p.ClientId).Contains(player.ClientId));
             }
         }
 

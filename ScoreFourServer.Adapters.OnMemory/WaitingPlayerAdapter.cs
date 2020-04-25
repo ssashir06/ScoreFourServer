@@ -14,9 +14,9 @@ namespace ScoreFourServer.Adapters.OnMemory
 {
     public class WaitingPlayerAdapter : IWaitingPlayerAdapter
     {
-        internal static List<Tuple<Player, DateTimeOffset>> WaitingPlayers { get; } = new List<Tuple<Player, DateTimeOffset>>();
+        internal static List<Tuple<Client, DateTimeOffset>> WaitingPlayers { get; } = new List<Tuple<Client, DateTimeOffset>>();
 
-        public async Task<Player> DequeueAsync(CancellationToken cancellationToken)
+        public async Task<Client> DequeueAsync(CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
             lock (WaitingPlayers)
@@ -35,15 +35,15 @@ namespace ScoreFourServer.Adapters.OnMemory
             }
         }
 
-        public async Task EnqueueAsync(Player player, DateTimeOffset timeOut, CancellationToken cancellationToken)
+        public async Task EnqueueAsync(Client player, DateTimeOffset timeOut, CancellationToken cancellationToken)
         {
             await Dummy.Delay(cancellationToken);
             lock (WaitingPlayers)
             {
                 WaitingPlayers.RemoveAll(m => DateTimeOffset.Now >= m.Item2);
-                if (WaitingPlayers.Any(m => m.Item1.GameUserId == player.GameUserId))
+                if (WaitingPlayers.Any(m => m.Item1.ClientId == player.ClientId))
                 {
-                    Trace.WriteLine($"Game user id {player.GameUserId} is already enqueued.");
+                    Trace.WriteLine($"Game user id {player.ClientId} is already enqueued.");
                 }
                 else
                 {

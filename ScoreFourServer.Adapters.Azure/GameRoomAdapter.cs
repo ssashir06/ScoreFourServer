@@ -24,7 +24,7 @@ namespace ScoreFourServer.Adapters.Azure
 
         public CloudStorageAccount StorageAccount { get; }
 
-        private async Task<CloudTable> GetTable(CancellationToken cancellationToken)
+        private async Task<CloudTable> GetTableAsync(CancellationToken cancellationToken)
         {
             var tableClient = StorageAccount.CreateCloudTableClient(new TableClientConfiguration());
             var table = tableClient.GetTableReference(tableName);
@@ -36,7 +36,7 @@ namespace ScoreFourServer.Adapters.Azure
         {
             try
             {
-                var table = await GetTable(cancellationToken);
+                var table = await GetTableAsync(cancellationToken);
                 var query = new TableQuery<GameRoomTableEntity>()
                     .Where(TableQuery.CombineFilters(
                         TableQuery.GenerateFilterCondition(nameof(GameRoomTableEntity.RowKey), QueryComparisons.Equal, gameRoomId.ToString("D")),
@@ -53,17 +53,17 @@ namespace ScoreFourServer.Adapters.Azure
             }
         }
 
-        public async Task<GameRoom> GetLatestCreatedByPlayerAsync(Player player, CancellationToken cancellationToken)
+        public async Task<GameRoom> GetLatestCreatedByPlayerAsync(Client player, CancellationToken cancellationToken)
         {
             try
             {
-                var table = await GetTable(cancellationToken);
+                var table = await GetTableAsync(cancellationToken);
                 var query = new TableQuery<GameRoomTableEntity>()
                     .Where(TableQuery.CombineFilters(
                         TableQuery.CombineFilters(
-                            TableQuery.GenerateFilterConditionForGuid(nameof(GameRoomTableEntity.Player1GameUserId), QueryComparisons.Equal, player.GameUserId),
+                            TableQuery.GenerateFilterConditionForGuid(nameof(GameRoomTableEntity.Player1ClientId), QueryComparisons.Equal, player.ClientId),
                             TableOperators.Or,
-                            TableQuery.GenerateFilterConditionForGuid(nameof(GameRoomTableEntity.Player2GameUserId), QueryComparisons.Equal, player.GameUserId)
+                            TableQuery.GenerateFilterConditionForGuid(nameof(GameRoomTableEntity.Player2ClientId), QueryComparisons.Equal, player.ClientId)
                             ),
                         TableOperators.And,
                         TableQuery.GenerateFilterCondition(nameof(GameRoomTableEntity.GameRoomStatus), QueryComparisons.Equal, GameRoomStatus.Created.ToString())
@@ -86,7 +86,7 @@ namespace ScoreFourServer.Adapters.Azure
             {
                 var entity = (GameRoomTableEntity)gameRoom;
                 var operation = TableOperation.InsertOrMerge(entity);
-                var table = await GetTable(cancellationToken);
+                var table = await GetTableAsync(cancellationToken);
                 var result = await table.ExecuteAsync(operation, cancellationToken);
                 var inserted = result.Result as GameRoomTableEntity;
             }

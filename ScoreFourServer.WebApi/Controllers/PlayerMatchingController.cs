@@ -32,25 +32,39 @@ namespace ScoreFourServer.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> AddGamePlayer(GamePlayerPutVM gamePlayer)
         {
-            var player = new Player(gamePlayer.GameUserId, gamePlayer.Name);
+            var player = new Client(gamePlayer.GameUserId, gamePlayer.ClientId, gamePlayer.Name);
             var ct = HttpContext.RequestAborted;
             await playerMatchingService.AddGamePlayer(player, ct);
 
             return Ok();
         }
 
-        [HttpGet("GamePlayer/{gameUserId}")]
+        [HttpGet("GamePlayer/{clientId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
-        public async Task<IActionResult> MatchAsync(Guid gameUserId)
+        public async Task<IActionResult> MatchAsync(Guid clientId)
         {
-            var player = new Player(gameUserId, null);
+            var player = new Client(Guid.Empty, clientId, null);
             var ct = HttpContext.RequestAborted;
-            var gameRoom = await playerMatchingService.MatchAsync(player, ct);
+            var (gameRoom, clientToken) = await playerMatchingService.MatchAsync(player, ct);
             if (gameRoom != null)
             {
-                logger.LogInformation($"Matching found: Player1={gameRoom.Players[0].Name} {gameRoom.Players[0].GameUserId}, Player2={gameRoom.Players[1].Name} {gameRoom.Players[1].GameUserId}");
-                return new JsonResult(gameRoom);
+                logger.LogInformation($"Matching found: Player1={gameRoom.Players[0].Name} {gameRoom.Players[0].ClientId}, Player2={gameRoom.Players[1].Name} {gameRoom.Players[1].ClientId}");
+                var token = Convert.ToBase64String(clientToken.Token.ToByteArray());
+                return new JsonResult(new
+                {
+                    GameRoom = new GameRoomGetVM
+                    {
+                        GameRoomId = gameRoom.GameRoomId,
+                        Name = gameRoom.Name,
+                        Players = gameRoom.Players.Select(m => new Player
+                        {
+                            GameUserId = m.GameUserId,
+                            Name = m.Name,
+                        }).ToArray(),
+                    },
+                    Token = token
+                });
             }
             else
             {

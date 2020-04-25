@@ -21,6 +21,6 @@
         /// <summary>
         /// Timed out
         /// </summary>
-        TimedOut,
+        Timedout,
     }
 }

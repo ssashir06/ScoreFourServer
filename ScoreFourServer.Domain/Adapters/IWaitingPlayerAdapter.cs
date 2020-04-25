@@ -10,7 +10,7 @@ namespace ScoreFourServer.Domain.Adapters
 {
     public interface IWaitingPlayerAdapter
     {
-        Task<Player> DequeueAsync(CancellationToken cancellationToken);
-        Task EnqueueAsync(Player player, DateTimeOffset timeOut, CancellationToken cancellationToken);
+        Task<Client> DequeueAsync(CancellationToken cancellationToken);
+        Task EnqueueAsync(Client player, DateTimeOffset timeout, CancellationToken cancellationToken);
     }
 }

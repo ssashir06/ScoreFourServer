@@ -25,7 +25,7 @@ namespace ScoreFourServer.Adapters.Azure
 
         public CloudStorageAccount StorageAccount { get; }
 
-        private async Task<CloudQueue> GetQueue(CancellationToken cancellationToken)
+        private async Task<CloudQueue> GetQueueAsync(CancellationToken cancellationToken)
         {
             var queueClient = StorageAccount.CreateCloudQueueClient();
             var queue = queueClient.GetQueueReference(queueName);
@@ -33,11 +33,11 @@ namespace ScoreFourServer.Adapters.Azure
             return queue;
         }
 
-        public async Task<Player> DequeueAsync(CancellationToken cancellationToken)
+        public async Task<Client> DequeueAsync(CancellationToken cancellationToken)
         {
             try
             {
-                var queue = await GetQueue(cancellationToken);
+                var queue = await GetQueueAsync(cancellationToken);
                 var message = await queue.GetMessageAsync();
                 if (message == null)
                 {
@@ -47,7 +47,7 @@ namespace ScoreFourServer.Adapters.Azure
                 await queue.DeleteMessageAsync(message);
                 var converter = new ExpandoObjectConverter();
                 dynamic obj = JsonConvert.DeserializeObject<ExpandoObject>(message.AsString, converter);
-                return new Player(Guid.Parse(obj.GameUserId), obj.Name);
+                return new Client(Guid.Parse(obj.GameUserId), Guid.Parse(obj.ClientId), obj.Name);
             }
             catch (StorageException ex)
             {
@@ -56,15 +56,15 @@ namespace ScoreFourServer.Adapters.Azure
             }
         }
 
-        public async Task EnqueueAsync(Player player, DateTimeOffset timeOut, CancellationToken cancellationToken)
+        public async Task EnqueueAsync(Client player, DateTimeOffset timeout, CancellationToken cancellationToken)
         {
             try
             {
-                var queue = await GetQueue(cancellationToken);
+                var queue = await GetQueueAsync(cancellationToken);
                 var str = JsonConvert.SerializeObject(player);
                 var message = new CloudQueueMessage(str);
                 await queue.AddMessageAsync(message,
-                    timeToLive: timeOut - DateTimeOffset.Now,
+                    timeToLive: timeout - DateTimeOffset.Now,
                     initialVisibilityDelay: TimeSpan.Zero,
                     null, null, cancellationToken);
             }
